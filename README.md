@@ -23,11 +23,13 @@ npm install
 npm run dev
 ```
 
-## Despliegue (Firebase App Hosting)
+## Despliegue (Vercel)
 
-El backend de App Hosting está conectado a la rama `main` de este repositorio: cada `git push` a `main`
-compila y publica una nueva versión. La configuración de Cloud Run está en `apphosting.yaml`.
-Requiere el plan Blaze. No necesita variables de entorno.
+El proyecto está importado en Vercel (plan Hobby, gratuito) desde la rama `main` de este repositorio:
+cada `git push` a `main` compila y publica una nueva versión, y cada rama o PR obtiene una URL de vista previa.
+No necesita variables de entorno ni configuración extra.
+
+Alternativa: `apphosting.yaml` y `.firebaserc` dejan lista la app para Firebase App Hosting, que requiere el plan Blaze.
 
 ## Limitaciones
 
