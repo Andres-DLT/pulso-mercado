@@ -29,8 +29,6 @@ El proyecto está importado en Vercel (plan Hobby, gratuito) desde la rama `main
 cada `git push` a `main` compila y publica una nueva versión, y cada rama o PR obtiene una URL de vista previa.
 No necesita variables de entorno ni configuración extra.
 
-Alternativa: `apphosting.yaml` y `.firebaserc` dejan lista la app para Firebase App Hosting, que requiere el plan Blaze.
-
 ## Limitaciones
 
 - Los datos vienen de los endpoints públicos no oficiales de Yahoo Finance. Para tráfico alto o uso comercial,

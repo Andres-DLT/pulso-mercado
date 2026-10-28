@@ -1,8 +1,0 @@
-# Configuración de Firebase App Hosting (Cloud Run).
-# minInstances 0 = sin coste cuando nadie usa la app; maxInstances limita el gasto con picos de tráfico.
-runConfig:
-  minInstances: 0
-  maxInstances: 2
-  concurrency: 80
-  cpu: 1
-  memoryMiB: 512

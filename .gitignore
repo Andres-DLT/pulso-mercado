@@ -3,5 +3,5 @@ node_modules
 .vercel
 .env*.local
 .claude
-.firebase
-firebase-debug.log
+
+.vercel
