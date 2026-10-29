@@ -42,6 +42,9 @@ La app funciona sin variables de entorno. Variables opcionales:
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Claves para enviar notificaciones push (`npx web-push generate-vapid-keys`). |
 | `CRON_SECRET` | Protege `/api/push/check`, que revisa las alertas. |
 
+`node scripts/setup-push.cjs` genera las claves VAPID y el `CRON_SECRET`, las guarda en `.env.local` y las añade
+a Vercel (producción).
+
 Los avisos push se revisan cuando un programador llama a `GET /api/push/check` con la cabecera
 `Authorization: Bearer <CRON_SECRET>`. Vercel Cron (plan Hobby) lo hace una vez al día; para revisarlas cada pocos
 minutos se puede usar un servicio externo como cron-job.org.
