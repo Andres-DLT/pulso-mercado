@@ -1,5 +1,5 @@
 // Genera las claves de los avisos push de Pulso y las guarda en Vercel (producción) y en .env.local.
-// Ejecútalo desde la carpeta del proyecto:  node <ruta>\setup-push.cjs
+// Ejecútalo desde la carpeta del proyecto:  node scripts/setup-push.cjs
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
