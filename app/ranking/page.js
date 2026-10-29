@@ -12,6 +12,7 @@ const SORTS = {
   exp: { label: 'Retorno esperado 20d', get: (r) => r.expectedReturn20 },
   prob: { label: 'Prob. de subida 20d', get: (r) => r.probUp20 },
   mom: { label: 'Momentum 3M', get: (r) => r.returns['3M'] ?? -Infinity },
+  rs: { label: 'vs S&P 3M', get: (r) => r.relative3M ?? -Infinity },
   day: { label: 'Variación hoy', get: (r) => r.dayChange },
 };
 const TYPES = { all: 'Todos', EQUITY: 'Acciones', ETF: 'ETF', CRYPTOCURRENCY: 'Cripto' };
@@ -109,7 +110,8 @@ export default function Ranking() {
               <thead>
                 <tr>
                   <th>Activo</th><th>Precio</th>{th('day')}<th className="hide-sm">60d</th>{th('score')}
-                  {th('exp')}{th('prob')}{th('mom')}<th className="hide-sm">RSI</th><th className="hide-sm" title="Acierto direccional histórico de la señal a 20 días">Acierto hist.</th>
+                  {th('exp')}{th('prob')}{th('mom')}{th('rs')}<th className="hide-sm">RSI</th><th className="hide-sm" title="Acierto direccional histórico de la señal a 20 días">Acierto hist.</th>
+                  <th className="hide-sm" title="Rentabilidad de seguir la señal frente a comprar y mantener en el backtest">Señal / mantener</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,8 +125,14 @@ export default function Ranking() {
                     <td className={`mono ${tone(r.expectedReturn20)}`}>{fmtPct(r.expectedReturn20, 1, { ratio: true })}</td>
                     <td className="mono">{fmtNum(r.probUp20 * 100, 0)}%</td>
                     <td className={`mono ${tone(r.returns['3M'])}`}>{fmtPct(r.returns['3M'], 1, { ratio: true })}</td>
+                    <td className={`mono ${tone(r.relative3M)}`}>{fmtPct(r.relative3M, 1, { ratio: true })}</td>
                     <td className="mono hide-sm">{fmtNum(r.rsi, 0)}</td>
                     <td className="mono hide-sm muted">{r.accuracy == null ? '—' : `${fmtNum(r.accuracy * 100, 0)}%`}</td>
+                    <td className="mono hide-sm small">
+                      <span className={tone(r.signalReturn)}>{fmtPct(r.signalReturn, 0, { ratio: true })}</span>
+                      <span className="muted"> / </span>
+                      <span className={tone(r.buyHoldReturn)}>{fmtPct(r.buyHoldReturn, 0, { ratio: true })}</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -133,6 +141,7 @@ export default function Ranking() {
           <p className="muted small">
             “Retorno esperado” y “Prob. de subida” provienen de un modelo estadístico con alta incertidumbre: la mayoría de
             probabilidades rondan el 50–60%. “Acierto hist.” mide cuántas veces la señal acertó la dirección a 20 días en los últimos ~2 años.
+            “Señal / mantener” compara, en ese mismo periodo, invertir solo con señal alcista frente a mantener siempre.
           </p>
         </section>
       </main>

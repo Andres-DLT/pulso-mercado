@@ -13,6 +13,7 @@ export default function Header({ children }) {
       <nav className="nav">
         <Link href="/" className={path === '/' ? 'on' : ''}>Mercado</Link>
         <Link href="/ranking" className={path === '/ranking' ? 'on' : ''}>Ranking</Link>
+        <Link href="/cartera" className={path === '/cartera' ? 'on' : ''}>Cartera</Link>
       </nav>
       <div className="top-slot">{children}</div>
     </header>

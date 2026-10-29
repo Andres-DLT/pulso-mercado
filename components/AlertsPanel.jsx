@@ -2,7 +2,13 @@
 import { useEffect, useState } from 'react';
 import { fmtPrice } from '@/lib/format';
 
-export default function AlertsPanel({ symbol, price, currency, alerts, setAlerts }) {
+const PUSH_NOTE = {
+  unsupported: 'Este navegador no admite avisos con la app cerrada. En iPhone, añade Pulso a la pantalla de inicio y ábrelo desde ahí.',
+  denied: 'Las notificaciones están bloqueadas para este sitio: actívalas en los ajustes del navegador.',
+  error: 'No se pudieron activar los avisos en este navegador. Inténtalo de nuevo.',
+};
+
+export default function AlertsPanel({ symbol, price, currency, alerts, setAlerts, push }) {
   const [op, setOp] = useState('above');
   const [value, setValue] = useState('');
   const [perm, setPerm] = useState('unsupported');
@@ -31,19 +37,36 @@ export default function AlertsPanel({ symbol, price, currency, alerts, setAlerts
   };
 
   const remove = (id) => setAlerts((l) => l.filter((a) => a.id !== id));
-  const rearm = (id) => setAlerts((l) => l.map((a) => (a.id === id ? { ...a, triggered: false, triggeredAt: null } : a)));
+  const rearm = (id) => setAlerts((l) => l.map((a) => (a.id === id ? { ...a, triggered: false, triggeredAt: null, remote: false, rearmedAt: Date.now() } : a)));
   const sorted = [...alerts].sort((a, b) => (a.symbol === symbol ? -1 : 0) - (b.symbol === symbol ? -1 : 0) || Number(a.triggered) - Number(b.triggered));
 
   return (
     <section className="card">
       <div className="card-head">
         <h2>Alertas de precio</h2>
-        {perm !== 'granted' && perm !== 'unsupported' && (
+        {perm !== 'granted' && perm !== 'unsupported' && push?.state !== 'off' && (
           <button className="btn ghost small" onClick={askPerm} disabled={perm === 'denied'}>
             {perm === 'denied' ? 'Notificaciones bloqueadas' : 'Activar notificaciones'}
           </button>
         )}
       </div>
+      {push && push.state !== 'loading' && push.state !== 'disabled' && (
+        <div className={`push-box ${push.state === 'on' ? 'on' : ''}`}>
+          {push.state === 'on' ? (
+            <>
+              <span className="small">🔔 Te avisamos aunque cierres la app (revisión cada pocos minutos).</span>
+              <button className="btn ghost small" onClick={push.disable}>Desactivar</button>
+            </>
+          ) : push.state === 'off' ? (
+            <>
+              <span className="small">¿Quieres el aviso aunque cierres la app o el navegador?</span>
+              <button className="btn small" onClick={push.enable}>Avisarme siempre</button>
+            </>
+          ) : (
+            <span className="small muted">{PUSH_NOTE[push.state]}</span>
+          )}
+        </div>
+      )}
       <form className="alert-form" onSubmit={add}>
         <span className="mono"><b>{symbol}</b></span>
         <select value={op} onChange={(e) => setOp(e.target.value)} aria-label="Condición">
@@ -54,14 +77,19 @@ export default function AlertsPanel({ symbol, price, currency, alerts, setAlerts
         <button className="btn" type="submit">Crear</button>
       </form>
       {sorted.length === 0 ? (
-        <p className="muted small">Sin alertas. Se comprueban cada 10 s mientras la app esté abierta y se guardan en este navegador.</p>
+        <p className="muted small">
+          Sin alertas. Se comprueban cada 10 s mientras la app esté abierta
+          {push?.state === 'on' ? ' y cada pocos minutos en el servidor cuando está cerrada.' : ' y se guardan en este navegador.'}
+        </p>
       ) : (
         <ul className="alert-list">
           {sorted.map((a) => (
             <li key={a.id} className={a.triggered ? 'fired' : ''}>
               <span className="mono"><b>{a.symbol}</b> {a.op === 'above' ? '≥' : '≤'} {fmtPrice(a.price, a.currency)}</span>
               <span className="muted small">
-                {a.triggered ? `disparada ${new Date(a.triggeredAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}` : 'activa'}
+                {a.triggered
+                  ? `disparada ${new Date(a.triggeredAt).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${a.remote ? ' · aviso enviado' : ''}`
+                  : 'activa'}
               </span>
               <span className="row-actions">
                 {a.triggered && <button className="btn ghost small" onClick={() => rearm(a.id)}>Rearmar</button>}

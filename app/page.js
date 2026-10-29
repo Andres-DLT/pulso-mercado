@@ -7,6 +7,7 @@ import Sparkline from '@/components/Sparkline';
 import AnalysisPanel from '@/components/AnalysisPanel';
 import AlertsPanel from '@/components/AlertsPanel';
 import { useLocalStorage, usePoll, getJson } from '@/lib/hooks';
+import { usePushAlerts } from '@/lib/push-client';
 import { fmtPrice, fmtPct, fmtCompact, tone } from '@/lib/format';
 
 const PriceChart = dynamic(() => import('@/components/PriceChart'), {
@@ -44,6 +45,7 @@ export default function Dashboard() {
   const [toasts, setToasts] = useState([]);
   const [flash, setFlash] = useState({});
   const prevPrices = useRef({});
+  const push = usePushAlerts(alerts, setAlerts);
 
   // Símbolo inicial desde ?s=
   useEffect(() => {
@@ -187,7 +189,7 @@ export default function Dashboard() {
           </ul>
           {watch.length === 0 && <p className="muted small">Busca un símbolo y añádelo con ☆.</p>}
         </section>
-        <AlertsPanel symbol={symbol} price={price} currency={currency} alerts={alerts} setAlerts={setAlerts} />
+        <AlertsPanel symbol={symbol} price={price} currency={currency} alerts={alerts} setAlerts={setAlerts} push={push} />
         </aside>
 
         <div className="main">
@@ -200,7 +202,13 @@ export default function Dashboard() {
                           onClick={() => setWatch(inWatch ? watch.filter((x) => x !== symbol) : [...watch, symbol])}>
                     {inWatch ? '★' : '☆'}
                   </button>
-                  <span className={`badge ${open ? 'open' : ''}`}>{open ? <><i className="dot" />En vivo</> : 'Mercado cerrado'}</span>
+                  {q?.stale ? (
+                    <span className="badge stale-note" title="La fuente de datos no responde; se muestra el último precio conocido">
+                      Último dato {new Date(q.staleSince).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  ) : (
+                    <span className={`badge ${open ? 'open' : ''}`}>{open ? <><i className="dot" />En vivo</> : 'Mercado cerrado'}</span>
+                  )}
                 </div>
                 <div className="muted">{meta?.name ?? q?.name ?? ''}{meta?.exchange ? ` · ${meta.exchange}` : ''}{currency ? ` · ${currency}` : ''}</div>
               </div>
