@@ -1,7 +1,8 @@
-# Pulso — mercado en vivo y análisis técnico
+# Pulso
 
-App web (Next.js 16) con cotizaciones en tiempo real, gráficos de velas en vivo, alertas de precio,
-análisis técnico, pronóstico estadístico y un ranking de activos.
+App web para seguir el mercado en vivo: cotizaciones en tiempo real, gráficos de velas, alertas de
+precio, análisis técnico, un pronóstico estadístico y un ranking de activos. Hecha con Next.js 16 y
+publicada en Vercel: https://pulso-mercado.vercel.app
 
 ## Funciones
 
